@@ -1,6 +1,7 @@
-import 'package:fc_clima/services/location.dart';
+import 'package:fc_clima/screens/location_screen.dart';
+import 'package:fc_clima/services/weather.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -8,34 +9,34 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  void getLocation() async {
-    Location location = Location();
-    await location.getCurrentLocation();
-    print(location.latitude);
-    print(location.longitude);
-  }
+  void getLocationData() async {
+    WeatherModel weatherModel = WeatherModel();
+    var weatherData = await weatherModel.getWeatherDataByCurrentLocation();
 
-  void getData() async {
-    http.Response response = await http.get(
-        "http://api.openweathermap.org/data/2.5/weather?q=Tehran&appid=4388e16b4d56be56cbfedbe085f37839&units=metric");
-
-    if (response.statusCode == 200) {
-      print(response.body);
-    } else {
-      print(response.statusCode);
-    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) {
+        return LocationScreen(weatherData);
+      }),
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    getLocation();
+    getLocationData();
   }
 
 // API , Application Programming Interface
   @override
   Widget build(BuildContext context) {
-    getData();
-    return Scaffold();
+    return Scaffold(
+      body: Center(
+        child: SpinKitDoubleBounce(
+          color: Colors.white,
+          size: 50.0,
+        ),
+      ),
+    );
   }
 }
